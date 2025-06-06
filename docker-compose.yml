@@ -1,0 +1,45 @@
+# ##################################################
+# #                                                #
+# #          STACK DE RABBITMQ PARA TRAEFIK        #
+# #         https://digitallfran.co                #
+# #                                                #
+# ##################################################
+
+services:
+  rabbitmq:
+    ## -----------------https://digitallfran.co--------------------- ##
+    image: rabbitmq:3.13-management-alpine
+    # Para producción, se recomienda fijar una versión. Si eres experto
+    # y entiendes los riesgos, puedes usar 'rabbitmq:management-alpine'.
+    container_name: rabbitmq_main
+    hostname: rabbitmq_main
+    restart: unless-stopped
+    environment:
+      # Credenciales tomadas del archivo .env
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS}
+      RABBITMQ_ERLANG_COOKIE: ${RABBITMQ_COOKIE}
+    volumes:
+      # Volumen para que los datos de RabbitMQ (colas, mensajes) no se pierdan
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      # Se conecta a la red externa oficial del ecosistema
+      - digitallfran_net
+    labels:
+      # --- Instrucciones para Traefik ---
+      - "traefik.enable=true"
+      - "traefik.docker.network=digitallfran_net"
+      # --- Router para el Dashboard de RabbitMQ ---
+      - "traefik.http.routers.rabbitmq.rule=Host(`${RABBITMQ_DOMAIN}`)"
+      - "traefik.http.routers.rabbitmq.entrypoints=websecure"
+      - "traefik.http.routers.rabbitmq.tls.certresolver=myresolver"
+      - "traefik.http.routers.rabbitmq.service=rabbitmq"
+      # --- Servicio que apunta al puerto 15672 del panel de gestión ---
+      - "traefik.http.services.rabbitmq.loadbalancer.server.port=15672"
+
+volumes:
+  rabbitmq_data:
+
+networks:
+  digitallfran_net:
+    external: true
