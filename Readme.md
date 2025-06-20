@@ -1,50 +1,57 @@
-# Stack de RabbitMQ para Traefik by DigitAllFran
+<div align="center">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/7/71/RabbitMQ_logo.svg" alt="RabbitMQ Logo" width="140"/>
+  <h1 align="center">Stack de RabbitMQ para Traefik by DigitAllFran</h1>
+  <p>
+    <img src="https://img.shields.io/badge/RabbitMQ-3.x-orange?style=for-the-badge&logo=rabbitmq&logoColor=white" alt="RabbitMQ"/>
+    <img src="https://img.shields.io/badge/Traefik-v3-blueviolet?style=for-the-badge&logo=traefikproxy&logoColor=white" alt="Traefik v3"/>
+    <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker"/>
+    <img src="https://img.shields.io/badge/Let's%20Encrypt-003A70?style=for-the-badge&logo=letsencrypt&logoColor=yellow" alt="Let's Encrypt"/>
+  </p>
+</div>
 
-Este stack despliega RabbitMQ, un robusto y popular bróker de mensajería, e incluye su panel de gestión (`management`). La configuración está diseñada para ser gestionada y asegurada por un stack de Traefik existente.
+> [!NOTE]
+> **Stack robusto y seguro**  
+> Despliega RabbitMQ con panel de gestión (`management`), asegurado por Traefik con SSL automático y autenticación externa lista para microservicios.
 
-## Arquitectura y Dependencias
+> [!TIP]
+> **Arquitectura y dependencias**  
+> - **Traefik v3** funcionando como proxy inverso ([Stack recomendado](https://github.com/bicibikes15/Traefik))
+> - **Red Docker externa**: `digitallfran_net`
+> - **Subdominio** para el panel de RabbitMQ (ej. `mq.tudominio.com`) apuntando a tu Traefik
 
-RabbitMQ es un aliado poderoso en un ecosistema de microservicios. Para funcionar como se ha diseñado en este stack, requiere de:
+> [!IMPORTANT]
+> **El Ritual de Invocación (Instalación)**
+> 1. **Clona el repositorio:**
+>    ```
+>    git clone https://github.com/bicibikes15/rabbitmq-stack-traefik.git
+>    cd rabbitmq-stack-traefik
+>    ```
+> 2. **Verifica o crea la red externa:**
+>    ```
+>    docker network create digitallfran_net
+>    ```
+> 3. **Configura tus secretos:**
+>    ```
+>    cp .env.example .env
+>    # Edita .env y define:
+>    # RABBITMQ_DOMAIN=tu subdominio (ej. mq.tudominio.com)
+>    # RABBITMQ_USER=usuario admin
+>    # RABBITMQ_PASS=contraseña fuerte
+>    # RABBITMQ_COOKIE=una cadena larga y secreta
+>    ```
+> 4. **Despliega RabbitMQ:**
+>    ```
+>    docker compose up -d
+>    ```
 
-1.  **El Guardián (Traefik):** Una instancia de Traefik v3 funcionando como proxy inverso.
-    * **Stack Recomendado:** [Stack de Traefik de DigitAllFran](https://github.com/bicibikes15/Traefik)
+> [!WARNING]
+> **Verificación y acceso**  
+> Traefik asignará el certificado SSL y expondrá el panel de gestión en tu subdominio.  
+> Accede a `https://<RABBITMQ_DOMAIN>` y usa las credenciales que configuraste en el `.env`.
 
-2.  **La Red Compartida:** El estandarte oficial de este ecosistema es `digitallfran_net`. RabbitMQ se unirá a esta red para ser descubierto por Traefik.
+> [!NOTE]
+> **¿Todo funcionando?**  
+> Si ves el panel de RabbitMQ y puedes loguearte, ¡listo!  
+> Ya tienes un broker de mensajería robusto y seguro, listo para microservicios y automatización.
 
-## El Ritual de Invocación (Instalación)
-
-**1. Clonar el Repositorio**
-```bash
-# Reemplaza 'tu-github' con tu nombre de usuario y 'rabbitmq-stack' con el nombre de tu repo
-git clone [https://github.com/tu-github/rabbitmq-stack.git](https://github.com/tu-github/rabbitmq-stack.git)
-cd rabbitmq-stack
-
-2. Verificar la Red Externa
-
-Asegúrate de que la red digitallfran_net existe. Si no, créala:
-
-Bash
-
-docker network create digitallfran_net
-
-3. Configurar los Secretos
-
-Crea tu archivo de configuración local a partir de la plantilla.
-
-Bash
-
-cp .env.example .env
-Ahora, edita el archivo .env (nano .env) y establece tus valores:
-
-RABBITMQ_DOMAIN: El subdominio para el panel de gestión de RabbitMQ.
-RABBITMQ_USER: Tu usuario administrador.
-RABBITMQ_PASS: Una contraseña fuerte para tu usuario.
-RABBITMQ_COOKIE: Una cadena de texto larga y secreta para la comunicación interna de RabbitMQ.
-
-4. Desplegar RabbitMQ
-
-Bash
-
-docker compose up -d
-Verificación
-Traefik asignará un certificado SSL al dominio y lo expondrá de forma segura. Accede al panel de gestión en https:// seguido de tu RABBITMQ_DOMAIN y usa las credenciales que creaste para iniciar sesión.
+****
